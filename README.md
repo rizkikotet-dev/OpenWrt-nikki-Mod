@@ -51,7 +51,7 @@ Note that the steps above may change base on config.
 
 ```shell
 # add feed
-echo "src-git mihomo https://github.com/morytyann/OpenWrt-mihomo-Mod.git;mod" >> "feeds.conf.default"
+echo "src-git mihomo https://github.com/rizkikotet-dev/OpenWrt-mihomo-Mod.git;mod" >> "feeds.conf.default"
 # update & install feeds
 ./scripts/feeds update -a
 ./scripts/feeds install -a
