@@ -43,7 +43,6 @@ if [ -x "/bin/opkg" ]; then
 	echo "install ipks"
 	opkg install mihomo_*.ipk
 	opkg install luci-app-mihomo_*.ipk
-	opkg install luci-i18n-mihomo-zh-cn_*.ipk
 	rm -f -- *mihomo*.ipk
 elif [ -x "/usr/bin/apk" ]; then
 	# update feeds
@@ -53,7 +52,6 @@ elif [ -x "/usr/bin/apk" ]; then
 	echo "install apks"
 	apk add --allow-untrusted mihomo-*.apk
 	apk add --allow-untrusted luci-app-mihomo-*.apk
-	apk add --allow-untrusted luci-i18n-mihomo-zh-cn-*.apk
 	rm -f -- *mihomo*.apk
 fi
 

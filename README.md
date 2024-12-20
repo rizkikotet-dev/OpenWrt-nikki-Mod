@@ -1,6 +1,6 @@
-![GitHub License](https://img.shields.io/github/license/morytyann/OpenWrt-mihomo?style=for-the-badge&logo=github) ![GitHub Tag](https://img.shields.io/github/v/release/morytyann/OpenWrt-mihomo?style=for-the-badge&logo=github) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/morytyann/OpenWrt-mihomo/total?style=for-the-badge&logo=github) ![GitHub Repo stars](https://img.shields.io/github/stars/morytyann/OpenWrt-mihomo?style=for-the-badge&logo=github) [![Telegram](https://img.shields.io/badge/Contact-Telegram-26A5E4?style=for-the-badge&logo=telegram)](https://t.me/mihomotproxy)
+![GitHub License](https://img.shields.io/github/license/morytyann/OpenWrt-mihomo?style=for-the-badge&logo=github) ![GitHub Tag](https://img.shields.io/github/v/release/rizkikotet-dev/OpenWrt-mihomo-Mod?style=for-the-badge&logo=github) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/rizkikotet-dev/OpenWrt-mihomo-Mod/total?style=for-the-badge&logo=github) ![GitHub Repo stars](https://img.shields.io/github/stars/rizkikotet-dev/OpenWrt-mihomo-Mod?style=for-the-badge&logo=github) [![Telegram](https://img.shields.io/badge/Contact-Telegram-26A5E4?style=for-the-badge&logo=telegram)](https://t.me/RizkiKotet)
 
-# MihomoTProxy
+# MihomoTProxy-MOD
 
 Transparent Proxy with Mihomo on OpenWrt.
 
@@ -20,39 +20,16 @@ Transparent Proxy with Mihomo on OpenWrt.
 
 ## Install & Update
 
-### A. Install From Feed (Recommended)
-
-1. Add Feed
+### A. Install From Release
 
 ```shell
-# only needs to be run once
-curl -s -L https://github.com/morytyann/OpenWrt-mihomo/raw/refs/heads/main/feed.sh | ash
-```
-
-2. Install
-
-```shell
-# you can install from shell or `Software` menu in LuCI
-# for opkg
-opkg install mihomo
-opkg install luci-app-mihomo
-opkg install luci-i18n-mihomo-zh-cn
-# for apk
-apk add --allow-untrusted mihomo
-apk add --allow-untrusted luci-app-mihomo
-apk add --allow-untrusted luci-i18n-mihomo-zh-cn
-```
-
-### B. Install From Release
-
-```shell
-curl -s -L https://github.com/morytyann/OpenWrt-mihomo/raw/refs/heads/main/install.sh | ash
+curl -s -L https://github.com/rizkikotet-dev/OpenWrt-mihomo-Mod/raw/refs/heads/mod/install.sh | ash
 ```
 
 ## Uninstall & Reset
 
 ```shell
-curl -s -L https://github.com/morytyann/OpenWrt-mihomo/raw/refs/heads/main/uninstall.sh | ash
+curl -s -L https://ghp.ci/https://github.com/rizkikotet-dev/OpenWrt-mihomo-Mod/raw/refs/heads/mod/uninstall.sh | ash
 ```
 
 ## How To Use
@@ -74,7 +51,7 @@ Note that the steps above may change base on config.
 
 ```shell
 # add feed
-echo "src-git mihomo https://github.com/morytyann/OpenWrt-mihomo.git;main" >> "feeds.conf.default"
+echo "src-git mihomo https://github.com/morytyann/OpenWrt-mihomo-Mod.git;mod" >> "feeds.conf.default"
 # update & install feeds
 ./scripts/feeds update -a
 ./scripts/feeds install -a
