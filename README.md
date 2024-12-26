@@ -1,4 +1,8 @@
-![GitHub License](https://img.shields.io/github/license/morytyann/OpenWrt-mihomo?style=for-the-badge&logo=github) ![GitHub Tag](https://img.shields.io/github/v/release/rizkikotet-dev/OpenWrt-mihomo-Mod?style=for-the-badge&logo=github) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/rizkikotet-dev/OpenWrt-mihomo-Mod/total?style=for-the-badge&logo=github) ![GitHub Repo stars](https://img.shields.io/github/stars/rizkikotet-dev/OpenWrt-mihomo-Mod?style=for-the-badge&logo=github) [![Telegram](https://img.shields.io/badge/Contact-Telegram-26A5E4?style=for-the-badge&logo=telegram)](https://t.me/RizkiKotet)
+![GitHub License](https://img.shields.io/github/license/morytyann/OpenWrt-mihomo?style=for-the-badge&logo=github) 
+![GitHub Tag](https://img.shields.io/github/v/release/rizkikotet-dev/OpenWrt-mihomo-Mod?style=for-the-badge&logo=github) 
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/rizkikotet-dev/OpenWrt-mihomo-Mod/total?style=for-the-badge&logo=github) 
+![GitHub Repo stars](https://img.shields.io/github/stars/rizkikotet-dev/OpenWrt-mihomo-Mod?style=for-the-badge&logo=github) 
+[![Telegram](https://img.shields.io/badge/Contact-Telegram-26A5E4?style=for-the-badge&logo=telegram)](https://t.me/RizkiKotet)
 
 # MihomoTProxy-MOD
 
