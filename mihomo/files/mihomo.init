@@ -66,7 +66,7 @@ start_service() {
 	config_get_bool ipv6 "mixin" "ipv6" 0
 	config_get tcp_keep_alive_idle "mixin" "tcp_keep_alive_idle" 600
 	config_get tcp_keep_alive_interval "mixin" "tcp_keep_alive_interval" 15
-	config_get enable_unified_delay "mixin" "enable_unified_delay" 0
+	config_get_bool enable_unified_delay "mixin" "enable_unified_delay" 0
 	config_get log_level "mixin" "log_level" "info"
 	### external control
 	local ui_name ui_url api_port api_secret selection_cache
