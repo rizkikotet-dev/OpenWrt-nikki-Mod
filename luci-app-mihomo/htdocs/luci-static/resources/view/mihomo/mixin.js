@@ -94,6 +94,14 @@ return view.extend({
     o = s.taboption(
       "general",
       form.Flag,
+      "enable_tcp_concurrent",
+      "*" + " " + _("Enable Tcp Concurrent")
+    );
+    o.rmempty = false;
+
+    o = s.taboption(
+      "general",
+      form.Flag,
       "enable_unified_delay",
       "*" + " " + _("Enable Unified Delay")
     );
