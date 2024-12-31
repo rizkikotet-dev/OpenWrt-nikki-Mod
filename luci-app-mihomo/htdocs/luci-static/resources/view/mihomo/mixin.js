@@ -91,6 +91,14 @@ return view.extend({
     o.datatype = "uinteger";
     o.placeholder = "15";
 
+    o = s.taboption(
+      "general",
+      form.Flag,
+      "enable_unified_delay",
+      "*" + " " + _("Enable Unified Delay")
+    );
+    o.rmempty = false;
+
     s.tab("external_control", _("External Control Config"));
 
     o = s.taboption(
