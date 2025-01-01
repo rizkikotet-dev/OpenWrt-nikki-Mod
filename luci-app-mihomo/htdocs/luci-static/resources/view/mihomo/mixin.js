@@ -1,11 +1,11 @@
-'use strict';
-'require form';
-'require view';
-'require uci';
-'require fs';
-'require poll';
-'require tools.widgets as widgets';
-'require tools.mihomo as mihomo';
+"use strict";
+"require form";
+"require view";
+"require uci";
+"require fs";
+"require poll";
+"require tools.widgets as widgets";
+"require tools.mihomo as mihomo";
 
 return view.extend({
     load: function () {
@@ -18,12 +18,12 @@ return view.extend({
 
         m = new form.Map('mihomo');
 
-        s = m.section(form.NamedSection, 'config', 'config', _('Mixin Config'));
+        s = m.section(form.NamedSection, 'config', 'config', _('<p><strong>⚙️ Mixin Config</strong></p>'));
 
         o = s.option(form.Flag, 'mixin', _('Enable'));
         o.rmempty = false;
 
-        s = m.section(form.NamedSection, 'mixin', 'mixin', _('Mixin Option'));
+        s = m.section(form.NamedSection, 'mixin', 'mixin', _('<p><strong>⚙️ Mixin Option</strong></p>'));
 
         s.tab('general', _('General Config'));
 
