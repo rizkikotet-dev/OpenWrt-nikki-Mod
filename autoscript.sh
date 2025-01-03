@@ -74,9 +74,7 @@ cleanup() {
 # Network connectivity check
 check_network() {
     log_message "info" "Checking network connectivity..."
-    if ! ping -c 3 github.com &> /dev/null; then
-        handle_error "No internet connection available"
-    fi
+    curl -s --head https://github.com/ > /dev/null || handle_error "No internet connection available"
 }
 
 # Backup functions with improved error checking
@@ -104,7 +102,7 @@ perform_backup() {
         fi
     done
 
-    tar -czvf "$output_tar_gz" "${files_to_backup[@]}" 2>/dev/null || 
+    tar -czvf "$output_tar_gz" "${files_to_backup[@]}" &> /dev/null || 
         handle_error "Backup failed"
     
     log_message "info" "Backup successfully created at: $output_tar_gz"
@@ -121,10 +119,10 @@ perform_restore() {
     
     [[ -f "$MIHOMO_CONFIG" ]] && cp "$MIHOMO_CONFIG" "$MIHOMO_CONFIG.bak"
 
-    tar -xzvf "$backup_file" -C / --overwrite || 
+    tar -xzvf "$backup_file" -C / --overwrite &> /dev/null|| 
         handle_error "Restore failed"
 
-    mv "$MIHOMO_DIR/mihomo" "$MIHOMO_CONFIG" 2>/dev/null
+    mv "$MIHOMO_DIR/mihomo" "$MIHOMO_CONFIG" &> /dev/null
     chmod 644 "$MIHOMO_CONFIG"
 
     log_message "info" "Restore completed successfully"
@@ -138,17 +136,17 @@ install_config() {
         "https://github.com/rizkikotet-dev/Config-Open-ClashMeta/archive/refs/heads/main.zip" || 
         handle_error "Failed to download configuration"
     
-    unzip -o "$TEMP_DIR/main.zip" -d "$TEMP_DIR" 2>/dev/null || 
+    unzip -o "$TEMP_DIR/main.zip" -d "$TEMP_DIR" &> /dev/null || 
         handle_error "Failed to extract configuration"
     cd "$TEMP_DIR/Config-Open-ClashMeta-main" || handle_error "Failed to change directory"
     
-    mv -f config/Country.mmdb "$MIHOMO_DIR/run/Country.mmdb" && chmod +x "$MIHOMO_DIR/run/Country.mmdb"
-    mv -f config/GeoIP.dat "$MIHOMO_DIR/run/GeoIP.dat" && chmod +x "$MIHOMO_DIR/run/GeoIP.dat"
-    mv -f config/GeoSite.dat "$MIHOMO_DIR/run/GeoSite.dat" && chmod +x "$MIHOMO_DIR/run/GeoSite.dat"
-    mv -f config/proxy_provider/* "$MIHOMO_DIR/run/proxy_provider/" 2>/dev/null && chmod -R 755 "$MIHOMO_DIR/run/proxy_provider"
-    mv -f config/rule_provider/* "$MIHOMO_DIR/run/rule_provider/" 2>/dev/null  && chmod -R 755 "$MIHOMO_DIR/run/rule_provider"
-    mv -f config/config/* "$MIHOMO_DIR/profiles/" 2>/dev/null && chmod -R 755 "$MIHOMO_DIR/profiles"
-    mv -f config/mihomo $MIHOMO_CONFIG && chmod 644 $MIHOMO_CONFIG
+    mv -f config/Country.mmdb "$MIHOMO_DIR/run/Country.mmdb" &> /dev/null && chmod +x "$MIHOMO_DIR/run/Country.mmdb"
+    mv -f config/GeoIP.dat "$MIHOMO_DIR/run/GeoIP.dat" &> /dev/null && chmod +x "$MIHOMO_DIR/run/GeoIP.dat"
+    mv -f config/GeoSite.dat "$MIHOMO_DIR/run/GeoSite.dat" &> /dev/null && chmod +x "$MIHOMO_DIR/run/GeoSite.dat"
+    mv -f config/proxy_provider/* "$MIHOMO_DIR/run/proxy_provider/" &> /dev/null && chmod -R 755 "$MIHOMO_DIR/run/proxy_provider"
+    mv -f config/rule_provider/* "$MIHOMO_DIR/run/rule_provider/" &> /dev/null  && chmod -R 755 "$MIHOMO_DIR/run/rule_provider"
+    mv -f config/config/* "$MIHOMO_DIR/profiles/" &> /dev/null && chmod -R 755 "$MIHOMO_DIR/profiles"
+    mv -f config/mihomo $MIHOMO_CONFIG &> /dev/null && chmod 644 $MIHOMO_CONFIG
     
     log_message "info" "Installing Yacd dashboard..."
     cd "$TEMP_DIR" || handle_error "Failed to change directory"
@@ -156,7 +154,7 @@ install_config() {
         "https://github.com/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip" || 
         handle_error "Failed to download dashboard"
     
-    unzip -o "$TEMP_DIR/gh-pages.zip" -d "$TEMP_DIR" 2>/dev/null || handle_error "Failed to extract dashboard"
+    unzip -o "$TEMP_DIR/gh-pages.zip" -d "$TEMP_DIR" &> /dev/null || handle_error "Failed to extract dashboard"
     if [[ -d "$MIHOMO_DIR/run/ui/dashboard" ]]; then
         rm -rf "$MIHOMO_DIR/run/ui/dashboard"
     fi
@@ -264,7 +262,7 @@ install_mihomo() {
 
     # Extract tarball
     log_message "info" "Extracting package..."
-    if ! tar -xzf "$temp_dir/$tarball" -C "$temp_dir"; then
+    if ! tar -xzf "$temp_dir/$tarball" -C "$temp_dir" &> /dev/null; then
         rm -rf "$temp_dir"
         handle_error "Failed to extract package"
     fi
@@ -272,7 +270,7 @@ install_mihomo() {
     # Install packages based on package manager
     if [ -x "/bin/opkg" ]; then
         log_message "info" "Updating package feeds..."
-        if ! opkg update; then
+        if ! opkg update &> /dev/null; then
             rm -rf "$temp_dir"
             handle_error "Failed to update package feeds"
         fi
@@ -280,18 +278,18 @@ install_mihomo() {
         log_message "info" "Installing MihomoTProxy packages..."
         cd "$temp_dir" || handle_error "Failed to change to temporary directory"
         
-        if ! opkg install mihomo_*.ipk; then
+        if ! opkg install mihomo_*.ipk &> /dev/null; then
             rm -rf "$temp_dir"
             handle_error "Failed to install mihomo package"
         fi
         
-        if ! opkg install luci-app-mihomo_*.ipk; then
+        if ! opkg install luci-app-mihomo_*.ipk &> /dev/null; then
             rm -rf "$temp_dir"
             handle_error "Failed to install luci-app-mihomo package"
         fi
     elif [ -x "/usr/bin/apk" ]; then
         log_message "info" "Updating Alpine package repository..."
-        if ! apk update; then
+        if ! apk update &> /dev/null; then
             rm -rf "$temp_dir"
             handle_error "Failed to update package repository"
         fi
@@ -299,12 +297,12 @@ install_mihomo() {
         log_message "info" "Installing MihomoTProxy packages..."
         cd "$temp_dir" || handle_error "Failed to change to temporary directory"
         
-        if ! apk add --allow-untrusted mihomo-*.apk; then
+        if ! apk add --allow-untrusted mihomo-*.apk &> /dev/null; then
             rm -rf "$temp_dir"
             handle_error "Failed to install mihomo package"
         fi
         
-        if ! apk add --allow-untrusted luci-app-mihomo-*.apk; then
+        if ! apk add --allow-untrusted luci-app-mihomo-*.apk &> /dev/null; then
             rm -rf "$temp_dir"
             handle_error "Failed to install luci-app-mihomo package"
         fi
@@ -326,18 +324,18 @@ uninstall_mihomo() {
     # Remove packages based on package manager
     if [ -x "/bin/opkg" ]; then
         log_message "info" "Removing MihomoTProxy packages..."
-        if ! opkg remove luci-app-mihomo; then
+        if ! opkg remove luci-app-mihomo &> /dev/null; then
             log_message "warn" "Failed to remove luci-app-mihomo package"
         fi
-        if ! opkg remove mihomo; then
+        if ! opkg remove mihomo &> /dev/null; then
             log_message "warn" "Failed to remove mihomo package"
         fi
     elif [ -x "/usr/bin/apk" ]; then
         log_message "info" "Removing MihomoTProxy packages..."
-        if ! apk del luci-app-mihomo; then
+        if ! apk del luci-app-mihomo &> /dev/null; then
             log_message "warn" "Failed to remove luci-app-mihomo package"
         fi
-        if ! apk del mihomo; then
+        if ! apk del mihomo &> /dev/null; then
             log_message "warn" "Failed to remove mihomo package"
         fi
     else
