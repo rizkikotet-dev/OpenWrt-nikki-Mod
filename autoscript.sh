@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script configuration
-VERSION="2.4"
+VERSION="2.5"
 LOCKFILE="/tmp/mihomotproxy.lock"
 BACKUP_DIR="/root/backups-mihomo"
 TEMP_DIR="/tmp"
@@ -147,8 +147,7 @@ install_config() {
     mv -f config/GeoSite.dat "$MIHOMO_DIR/run/GeoSite.dat" && chmod +x "$MIHOMO_DIR/run/GeoSite.dat"
     mv -f config/proxy_provider/* "$MIHOMO_DIR/run/proxy_provider/" 2>/dev/null || true && chmod -R 755 "$MIHOMO_DIR/run/proxy_provider"
     mv -f config/rule_provider/* "$MIHOMO_DIR/run/rule_provider/" 2>/dev/null || true && chmod -R 755 "$MIHOMO_DIR/run/rule_provider"
-    mv -f config/config/config-rule-wrt.yaml "$MIHOMO_DIR/profiles/config-rule-wrt.yaml" && chmod +x "$MIHOMO_DIR/profiles/config-rule-wrt.yaml"
-    mv -f config/config/config-simple-wrt.yaml "$MIHOMO_DIR/profiles/config-simple-wrt.yaml" && chmod +x "$MIHOMO_DIR/profiles/config-simple-wrt.yaml"
+    mv -f config/config/* "$MIHOMO_DIR/profiles/" 2>/dev/null || true && chmod -R 755 "$MIHOMO_DIR/profiles"
     mv -f config/mihomo $MIHOMO_CONFIG && chmod 644 $MIHOMO_CONFIG
     
     log_message "info" "Installing Yacd dashboard..."
