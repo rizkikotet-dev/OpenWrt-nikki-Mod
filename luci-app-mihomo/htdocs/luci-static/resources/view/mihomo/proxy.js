@@ -24,7 +24,7 @@ return view.extend({
 
         m = new form.Map('mihomo');
 
-        s = m.section(form.NamedSection, 'proxy', 'proxy', _('Proxy Config'));
+        s = m.section(form.NamedSection, 'proxy', 'proxy', _('<p><strong>⚙️ Proxy Config</strong></p>'));
 
         s.tab('transparent_proxy', _('Transparent Proxy'));
 

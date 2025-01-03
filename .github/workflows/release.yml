@@ -55,7 +55,6 @@ jobs:
           FEEDNAME: mihomo
           PACKAGES: luci-app-mihomo
           INDEX: 1
-          KEY_BUILD: ${{ secrets.KEY_BUILD }}
           NO_REFRESH_CHECK: true
 
       - name: Compress
@@ -76,26 +75,3 @@ jobs:
         with:
           name: feed_mihomo_${{ matrix.arch }}-${{ matrix.branch }}
           path: feed_mihomo_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz
-
-  feed:
-    needs: release
-    name: feed
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download
-        uses: actions/download-artifact@v4
-        with:
-          pattern: feed_mihomo_*
-          merge-multiple: true
-      
-      - name: Uncompress
-        run: |
-          for file in feed_mihomo_*.tar.gz; do tar -x -z -f "$file"; done
-
-      - name: Feed
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          force_orphan: true
-          commit_message: Update Feed

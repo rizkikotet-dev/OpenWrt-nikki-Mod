@@ -15,7 +15,7 @@ return view.extend({
 
         m = new form.Map('mihomo');
 
-        s = m.section(form.NamedSection, 'config', 'config', _('Profile'));
+        s = m.section(form.NamedSection, 'config', 'config', _('<p><strong>📁 Profile</strong></p>'));
 
         o = s.option(form.FileUpload, '_upload_profile', _('Upload Profile'));
         o.browser = true;
