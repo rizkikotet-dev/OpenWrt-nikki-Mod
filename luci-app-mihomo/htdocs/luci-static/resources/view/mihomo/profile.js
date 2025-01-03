@@ -25,7 +25,7 @@ return view.extend({
             return true;
         };
 
-        s = m.section(form.GridSection, 'subscription', _('Subscription'));
+        s = m.section(form.GridSection, 'subscription', _('<p><strong>💾 Subscription</strong></p>'));
         s.addremove = true;
         s.anonymous = true;
         s.sortable = true;
