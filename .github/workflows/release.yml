@@ -54,7 +54,6 @@ jobs:
           ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
           FEEDNAME: mihomo
           PACKAGES: luci-app-mihomo
-          INDEX: 1
           NO_REFRESH_CHECK: true
 
       - name: Compress
