@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script configuration
-VERSION="2.5"
+VERSION="2.6"
 LOCKFILE="/tmp/mihomotproxy.lock"
 BACKUP_DIR="/root/backups-mihomo"
 TEMP_DIR="/tmp"
@@ -135,19 +135,19 @@ install_config() {
     log_message "info" "Downloading configuration files..."
     
     wget -q --show-progress -O "$TEMP_DIR/main.zip" \
-        "https://github.com/rtaserver/Config-Open-ClashMeta/archive/refs/heads/main.zip" || 
+        "https://github.com/rizkikotet-dev/Config-Open-ClashMeta/archive/refs/heads/main.zip" || 
         handle_error "Failed to download configuration"
     
-    unzip -o "$TEMP_DIR/main.zip" -d "$TEMP_DIR" || 
+    unzip -o "$TEMP_DIR/main.zip" -d "$TEMP_DIR" 2>/dev/null || 
         handle_error "Failed to extract configuration"
     cd "$TEMP_DIR/Config-Open-ClashMeta-main" || handle_error "Failed to change directory"
     
     mv -f config/Country.mmdb "$MIHOMO_DIR/run/Country.mmdb" && chmod +x "$MIHOMO_DIR/run/Country.mmdb"
     mv -f config/GeoIP.dat "$MIHOMO_DIR/run/GeoIP.dat" && chmod +x "$MIHOMO_DIR/run/GeoIP.dat"
     mv -f config/GeoSite.dat "$MIHOMO_DIR/run/GeoSite.dat" && chmod +x "$MIHOMO_DIR/run/GeoSite.dat"
-    mv -f config/proxy_provider/* "$MIHOMO_DIR/run/proxy_provider/" 2>/dev/null || true && chmod -R 755 "$MIHOMO_DIR/run/proxy_provider"
-    mv -f config/rule_provider/* "$MIHOMO_DIR/run/rule_provider/" 2>/dev/null || true && chmod -R 755 "$MIHOMO_DIR/run/rule_provider"
-    mv -f config/config/* "$MIHOMO_DIR/profiles/" 2>/dev/null || true && chmod -R 755 "$MIHOMO_DIR/profiles"
+    mv -f config/proxy_provider/* "$MIHOMO_DIR/run/proxy_provider/" 2>/dev/null && chmod -R 755 "$MIHOMO_DIR/run/proxy_provider"
+    mv -f config/rule_provider/* "$MIHOMO_DIR/run/rule_provider/" 2>/dev/null  && chmod -R 755 "$MIHOMO_DIR/run/rule_provider"
+    mv -f config/config/* "$MIHOMO_DIR/profiles/" 2>/dev/null && chmod -R 755 "$MIHOMO_DIR/profiles"
     mv -f config/mihomo $MIHOMO_CONFIG && chmod 644 $MIHOMO_CONFIG
     
     log_message "info" "Installing Yacd dashboard..."
@@ -156,7 +156,7 @@ install_config() {
         "https://github.com/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip" || 
         handle_error "Failed to download dashboard"
     
-    unzip -o "$TEMP_DIR/gh-pages.zip" -d "$TEMP_DIR" || handle_error "Failed to extract dashboard"
+    unzip -o "$TEMP_DIR/gh-pages.zip" -d "$TEMP_DIR" 2>/dev/null || handle_error "Failed to extract dashboard"
     if [[ -d "$MIHOMO_DIR/run/ui/dashboard" ]]; then
         rm -rf "$MIHOMO_DIR/run/ui/dashboard"
     fi
