@@ -27,7 +27,7 @@ Transparent Proxy with Mihomo on OpenWrt.
 ### Use Auto Script (Recommended)
 
 ```shell
-curl -s -L https://github.com/rizkikotet-dev/OpenWrt-mihomo-Mod/raw/refs/heads/main/autoscript.sh | ash
+bash -c "$(wget -qO - 'https://github.com/rizkikotet-dev/OpenWrt-mihomo-Mod/raw/refs/heads/main/autoscript.sh')"
 ```
 
 ## How To Use
