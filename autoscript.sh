@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script configuration
-VERSION="2.3"
+VERSION="2.4"
 LOCKFILE="/tmp/mihomotproxy.lock"
 BACKUP_DIR="/root/backups-mihomo"
 TEMP_DIR="/tmp"
@@ -132,7 +132,6 @@ perform_restore() {
 
 # Download and install configuration with progress tracking
 install_config() {
-    # check_network
     log_message "info" "Downloading configuration files..."
     
     wget -q --show-progress -O "$TEMP_DIR/main.zip" \
@@ -141,19 +140,17 @@ install_config() {
     
     unzip -o "$TEMP_DIR/main.zip" -d "$TEMP_DIR" || 
         handle_error "Failed to extract configuration"
-
     cd "$TEMP_DIR/Config-Open-ClashMeta-main" || handle_error "Failed to change directory"
     
-    # Move files to their respective locations
     mv -f config/Country.mmdb "$MIHOMO_DIR/run/Country.mmdb" && chmod +x "$MIHOMO_DIR/run/Country.mmdb"
     mv -f config/GeoIP.dat "$MIHOMO_DIR/run/GeoIP.dat" && chmod +x "$MIHOMO_DIR/run/GeoIP.dat"
     mv -f config/GeoSite.dat "$MIHOMO_DIR/run/GeoSite.dat" && chmod +x "$MIHOMO_DIR/run/GeoSite.dat"
-    mv -fT config/proxy_provider "$MIHOMO_DIR/run/proxy_provider" && chmod +x "$MIHOMO_DIR/run/proxy_provider"/*
-    mv -fT config/rule_provider "$MIHOMO_DIR/run/rule_provider" && chmod +x "$MIHOMO_DIR/run/rule_provider"/*
+    mv -f config/proxy_provider/* "$MIHOMO_DIR/run/proxy_provider/" 2>/dev/null || true && chmod -R 755 "$MIHOMO_DIR/run/proxy_provider"
+    mv -f config/rule_provider/* "$MIHOMO_DIR/run/rule_provider/" 2>/dev/null || true && chmod -R 755 "$MIHOMO_DIR/run/rule_provider"
     mv -f config/config/config-rule-wrt.yaml "$MIHOMO_DIR/profiles/config-rule-wrt.yaml" && chmod +x "$MIHOMO_DIR/profiles/config-rule-wrt.yaml"
     mv -f config/config/config-simple-wrt.yaml "$MIHOMO_DIR/profiles/config-simple-wrt.yaml" && chmod +x "$MIHOMO_DIR/profiles/config-simple-wrt.yaml"
     mv -f config/mihomo $MIHOMO_CONFIG && chmod 644 $MIHOMO_CONFIG
-
+    
     log_message "info" "Installing Yacd dashboard..."
     cd "$TEMP_DIR" || handle_error "Failed to change directory"
     wget -q --show-progress -O "$TEMP_DIR/gh-pages.zip" \
@@ -161,8 +158,10 @@ install_config() {
         handle_error "Failed to download dashboard"
     
     unzip -o "$TEMP_DIR/gh-pages.zip" -d "$TEMP_DIR" || handle_error "Failed to extract dashboard"
+    if [[ -d "$MIHOMO_DIR/run/ui/dashboard" ]]; then
+        rm -rf "$MIHOMO_DIR/run/ui/dashboard"
+    fi
     mv -fT "$TEMP_DIR/Yacd-meta-gh-pages" "$MIHOMO_DIR/run/ui/dashboard" || handle_error "Failed to install dashboard"
-
     log_message "info" "Configuration installation completed successfully!"
 }
 
