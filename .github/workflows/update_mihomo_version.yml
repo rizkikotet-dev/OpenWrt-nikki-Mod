@@ -17,7 +17,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: morytyann/OpenWrt-mihomo
+          repository: rizkikotet-dev/OpenWrt-mihomo-Mod
           ref: main
           path: OpenWrt-mihomo
       - id: get_current_info
@@ -59,7 +59,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: morytyann/OpenWrt-mihomo
+          repository: rizkikotet-dev/OpenWrt-mihomo-Mod
           ref: main
           path: OpenWrt-mihomo
       - id: update
