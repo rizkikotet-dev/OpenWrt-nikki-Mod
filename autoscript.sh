@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script configuration
-VERSION="2.6"
+VERSION="2.7"
 LOCKFILE="/tmp/mihomotproxy.lock"
 BACKUP_DIR="/root/backups-mihomo"
 TEMP_DIR="/tmp"
@@ -49,18 +49,13 @@ handle_error() {
 
 # Dependency check with more robust verification
 check_dependencies() {
-    local required_commands=("wget" "unzip" "tar" "curl" "jq")
-    local missing_commands=()
-
-    for cmd in "${required_commands[@]}"; do
+    local commands=("wget" "unzip" "tar" "curl" "jq")
+    for cmd in "${commands[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
-            missing_commands+=("$cmd")
+            log_message "info" "Installing missing dependency: $cmd"
+            opkg update && opkg install "$cmd" || handle_error "Failed to install $cmd"
         fi
     done
-
-    if [ ${#missing_commands[@]} -gt 0 ]; then
-        handle_error "Missing required commands: ${missing_commands[*]}"
-    fi
 }
 
 # Enhanced cleanup function
@@ -73,7 +68,6 @@ cleanup() {
 
 # Network connectivity check
 check_network() {
-    log_message "info" "Checking network connectivity..."
     curl -s --head https://github.com/ > /dev/null || handle_error "No internet connection available"
 }
 
