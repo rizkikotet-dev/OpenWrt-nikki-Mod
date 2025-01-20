@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script configuration
-VERSION="2.7"
+VERSION="2.8"
 LOCKFILE="/tmp/mihomotproxy.lock"
 BACKUP_DIR="/root/backups-mihomo"
 TEMP_DIR="/tmp"
@@ -125,10 +125,8 @@ perform_restore() {
 # Download and install configuration with progress tracking
 install_config() {
     log_message "info" "Downloading configuration files..."
-    
-    wget -q --show-progress -O "$TEMP_DIR/main.zip" \
-        "https://github.com/rizkikotet-dev/Config-Open-ClashMeta/archive/refs/heads/main.zip" || 
-        handle_error "Failed to download configuration"
+
+    curl -s -L -o "$TEMP_DIR/main.zip" "https://github.com/rizkikotet-dev/Config-Open-ClashMeta/archive/refs/heads/main.zip" ||  handle_error "Failed to download configuration"
     
     unzip -o "$TEMP_DIR/main.zip" -d "$TEMP_DIR" &> /dev/null || 
         handle_error "Failed to extract configuration"
@@ -144,10 +142,8 @@ install_config() {
     
     log_message "info" "Installing Yacd dashboard..."
     cd "$TEMP_DIR" || handle_error "Failed to change directory"
-    wget -q --show-progress -O "$TEMP_DIR/gh-pages.zip" \
-        "https://github.com/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip" || 
-        handle_error "Failed to download dashboard"
-    
+    curl -s -L -o "$TEMP_DIR/gh-pages.zip" "https://github.com/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip" || handle_error "Failed to download dashboard"
+
     unzip -o "$TEMP_DIR/gh-pages.zip" -d "$TEMP_DIR" &> /dev/null || handle_error "Failed to extract dashboard"
     if [[ -d "$MIHOMO_DIR/run/ui/dashboard" ]]; then
         rm -rf "$MIHOMO_DIR/run/ui/dashboard"
