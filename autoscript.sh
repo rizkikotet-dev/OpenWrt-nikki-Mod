@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script configuration
-VERSION="2.8"
+VERSION="2.9"
 LOCKFILE="/tmp/mihomotproxy.lock"
 BACKUP_DIR="/root/backups-mihomo"
 TEMP_DIR="/tmp"
@@ -135,8 +135,14 @@ install_config() {
     mv -f config/Country.mmdb "$MIHOMO_DIR/run/Country.mmdb" &> /dev/null && chmod +x "$MIHOMO_DIR/run/Country.mmdb"
     mv -f config/GeoIP.dat "$MIHOMO_DIR/run/GeoIP.dat" &> /dev/null && chmod +x "$MIHOMO_DIR/run/GeoIP.dat"
     mv -f config/GeoSite.dat "$MIHOMO_DIR/run/GeoSite.dat" &> /dev/null && chmod +x "$MIHOMO_DIR/run/GeoSite.dat"
-    mv -f config/proxy_provider/* "$MIHOMO_DIR/run/proxy_provider/" &> /dev/null && chmod -R 755 "$MIHOMO_DIR/run/proxy_provider"
-    mv -f config/rule_provider/* "$MIHOMO_DIR/run/rule_provider/" &> /dev/null  && chmod -R 755 "$MIHOMO_DIR/run/rule_provider"
+    if [ ! -d "$MIHOMO_DIR/run/proxy_provider" ]; then
+        mkdir -p "$MIHOMO_DIR/run/proxy_provider"
+        mv -f config/proxy_provider/* "$MIHOMO_DIR/run/proxy_provider/" &> /dev/null && chmod -R 755 "$MIHOMO_DIR/run/proxy_provider"
+    fi
+    if [ ! -d "$MIHOMO_DIR/run/rule_provider" ]; then
+        mkdir -p "$MIHOMO_DIR/run/rule_provider"
+        mv -f config/rule_provider/* "$MIHOMO_DIR/run/rule_provider/" &> /dev/null  && chmod -R 755 "$MIHOMO_DIR/run/rule_provider"
+    fi
     mv -f config/config/* "$MIHOMO_DIR/profiles/" &> /dev/null && chmod -R 755 "$MIHOMO_DIR/profiles"
     mv -f config/mihomo $MIHOMO_CONFIG &> /dev/null && chmod 644 $MIHOMO_CONFIG
     
