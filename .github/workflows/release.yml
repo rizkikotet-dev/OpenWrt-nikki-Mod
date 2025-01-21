@@ -4,17 +4,44 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - v*
+      - 'v*'
+
+env:
+  FEED_NAME: mihomo
+  PACKAGE_NAME: luci-app-mihomo
+  NO_REFRESH_CHECK: true
 
 jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.ref_name }}
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(grep 'PKG_VERSION:=' ./${{ env.PACKAGE_NAME }}/Makefile | awk -F '=' '{print $2}')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "New Version: ${VERSION}"
+
   release:
-    name: ${{ matrix.arch }}-${{ matrix.branch }} release
+    name: Build ${{ matrix.arch }}-${{ matrix.branch }}
+    needs: get-version
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
         arch:
+          # ARM architectures
           - arm_cortex-a5_vfpv4
           - arm_cortex-a7_neon-vfpv4
           - arm_cortex-a8_vfpv3
@@ -22,10 +49,12 @@ jobs:
           - arm_cortex-a9_vfpv3-d16
           - arm_cortex-a9_neon
           - arm_cortex-a15_neon-vfpv4
+          # ARM64 architectures
           - aarch64_cortex-a53
           - aarch64_cortex-a72
           - aarch64_cortex-a76
           - aarch64_generic
+          # MIPS architectures
           - mips_24kc
           - mips_4kec
           - mips_mips32
@@ -34,6 +63,7 @@ jobs:
           - mipsel_74kc
           - mipsel_mips32
           - mips64_octeonplus
+          # x86 architectures
           - i386_pentium4
           - x86_64
         branch:
@@ -45,33 +75,43 @@ jobs:
             branch: openwrt-23.05
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-      - name: Build
+      - name: Build package
         uses: openwrt/gh-action-sdk@main
         env:
           ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
-          FEEDNAME: mihomo
-          PACKAGES: luci-app-mihomo
-          INDEX: 1
-          KEY_BUILD: ${{ secrets.KEY_BUILD }}
-          NO_REFRESH_CHECK: true
+          FEEDNAME: ${{ env.FEED_NAME }}
+          PACKAGES: ${{ env.PACKAGE_NAME }}
+          NO_REFRESH_CHECK: ${{ env.NO_REFRESH_CHECK }}
 
-      - name: Compress
+      - name: Prepare artifacts
+        id: prepare
         run: |
-          tar -c -z -f mihomo_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz -C bin/packages/${{ matrix.arch }}/mihomo .
-          mkdir -p public/${{ matrix.branch }}/${{ matrix.arch }}
-          mv bin/packages/${{ matrix.arch }}/mihomo public/${{ matrix.branch }}/${{ matrix.arch }}
-          tar -c -z -f feed_mihomo_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz public/${{ matrix.branch }}/${{ matrix.arch }}
+          # Create distribution archives
+          mkdir -p "public/${{ matrix.branch }}/${{ matrix.arch }}"
+          cp -r "bin/packages/${{ matrix.arch }}/${{ env.FEED_NAME }}" "public/${{ matrix.branch }}/${{ matrix.arch }}"
+          
+          # Create package archive
+          tar -czf "mihomo_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz" \
+              -C "bin/packages/${{ matrix.arch }}/${{ env.FEED_NAME }}" .
+          
+          # Create feed archive
+          tar -czf "feed_mihomo_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz" \
+              "public/${{ matrix.branch }}/${{ matrix.arch }}"
 
-      - name: Release
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            mihomo_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz
+          tag_name: "v${{ needs.get-version.outputs.version }}"
+          files: mihomo_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz
+          fail_on_unmatched_files: false
+          generate_release_notes: true
 
-      - name: Upload
+      - name: Upload feed artifact
         uses: actions/upload-artifact@v4
         with:
           name: feed_mihomo_${{ matrix.arch }}-${{ matrix.branch }}
@@ -92,10 +132,6 @@ jobs:
       - name: Uncompress
         run: |
           for file in feed_mihomo_*.tar.gz; do tar -x -z -f "$file"; done
-      
-      - name: Key
-        run: |
-          echo "${{ secrets.KEY_BUILD_PUB }}" > public/key-build.pub
 
       - name: Feed
         uses: peaceiris/actions-gh-pages@v4

@@ -49,9 +49,17 @@
             "path": "mihomo/editor"
         }
     },
+    "admin/services/mihomo/advancededitor": {
+        "title": "Advanced Editor",
+        "order": 60,
+        "action": {
+            "type": "view",
+            "path": "mihomo/advancededitor"
+        }
+    },
     "admin/services/mihomo/log": {
         "title": "Log",
-        "order": 60,
+        "order": 70,
         "action": {
             "type": "view",
             "path": "mihomo/log"
