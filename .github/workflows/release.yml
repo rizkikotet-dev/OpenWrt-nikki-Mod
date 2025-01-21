@@ -116,4 +116,3 @@ jobs:
         with:
           name: feed_mihomo_${{ matrix.arch }}-${{ matrix.branch }}
           path: feed_mihomo_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz
-          retention-days: 5
