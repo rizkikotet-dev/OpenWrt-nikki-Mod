@@ -55,7 +55,6 @@ jobs:
           FEEDNAME: nikki
           PACKAGES: luci-app-nikki
           INDEX: 1
-          KEY_BUILD: ${{ secrets.KEY_BUILD }}
           NO_REFRESH_CHECK: true
 
       - name: Compress
