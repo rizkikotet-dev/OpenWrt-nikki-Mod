@@ -7,8 +7,29 @@ on:
       - v*
 
 jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ github.ref_name }}
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(grep 'PKG_VERSION:=' ./luci-app-nikki/Makefile | awk -F '=' '{print $2}')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "New Version: ${VERSION}"
+
   release:
     name: ${{ matrix.arch }}-${{ matrix.branch }} release
+    needs: get-version
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
@@ -54,7 +75,6 @@ jobs:
           ARCH: ${{ matrix.arch }}-${{ matrix.branch }}
           FEEDNAME: nikki
           PACKAGES: luci-app-nikki
-          INDEX: 1
           NO_REFRESH_CHECK: true
 
       - name: Compress
@@ -67,38 +87,13 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: "v${{ needs.get-version.outputs.version }}"
           files: |
             nikki_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz
+          generate_release_notes: true
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: feed_nikki_${{ matrix.arch }}-${{ matrix.branch }}
           path: feed_nikki_${{ matrix.arch }}-${{ matrix.branch }}.tar.gz
-
-  feed:
-    needs: release
-    name: feed
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download
-        uses: actions/download-artifact@v4
-        with:
-          pattern: feed_nikki_*
-          merge-multiple: true
-      
-      - name: Uncompress
-        run: |
-          for file in feed_nikki_*.tar.gz; do tar -x -z -f "$file"; done
-      
-      - name: Key
-        run: |
-          echo "${{ secrets.KEY_BUILD_PUB }}" > public/key-build.pub
-
-      - name: Feed
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          force_orphan: true
-          commit_message: Update Feed
