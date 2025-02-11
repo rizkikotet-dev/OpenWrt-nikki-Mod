@@ -50,13 +50,7 @@ apk add --allow-untrusted luci-i18n-nikki-zh-cn
 ### B. Install From Release
 
 ```shell
-curl -s -L https://github.com/rizkikotet-dev/OpenWrt-nikki-Mod/raw/refs/heads/main/install.sh | ash
-```
-
-## Uninstall & Reset
-
-```shell
-curl -s -L https://github.com/rizkikotet-dev/OpenWrt-nikki-Mod/raw/refs/heads/main/uninstall.sh | ash
+bash -c "$(curl -fsSL 'https://github.com/rizkikotet-dev/OpenWrt-nikki-Mod/raw/refs/heads/main/install.sh')"
 ```
 
 ## How To Use
