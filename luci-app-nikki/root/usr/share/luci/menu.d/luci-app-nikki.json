@@ -49,9 +49,17 @@
             "path": "nikki/editor"
         }
     },
+    "admin/services/nikki/advancededitor": {
+        "title": "Advanced Editor",
+        "order": 60,
+        "action": {
+            "type": "view",
+            "path": "nikki/advancededitor"
+        }
+    },
     "admin/services/nikki/log": {
         "title": "Log",
-        "order": 60,
+        "order": 70,
         "action": {
             "type": "view",
             "path": "nikki/log"

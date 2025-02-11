@@ -1,6 +1,10 @@
-![GitHub License](https://img.shields.io/github/license/nikkinikki-org/OpenWrt-nikki?style=for-the-badge&logo=github) ![GitHub Tag](https://img.shields.io/github/v/release/nikkinikki-org/OpenWrt-nikki?style=for-the-badge&logo=github) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/nikkinikki-org/OpenWrt-nikki/total?style=for-the-badge&logo=github) ![GitHub Repo stars](https://img.shields.io/github/stars/nikkinikki-org/OpenWrt-nikki?style=for-the-badge&logo=github) [![Telegram](https://img.shields.io/badge/Telegram-gray?style=for-the-badge&logo=telegram)](https://t.me/mugen_nikki)
+![GitHub License](https://img.shields.io/github/license/morytyann/OpenWrt-nikki?style=for-the-badge&logo=github) 
+![GitHub Tag](https://img.shields.io/github/v/release/rizkikotet-dev/OpenWrt-nikki-Mod?style=for-the-badge&logo=github) 
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/rizkikotet-dev/OpenWrt-nikki-Mod/total?style=for-the-badge&logo=github) 
+![GitHub Repo stars](https://img.shields.io/github/stars/rizkikotet-dev/OpenWrt-nikki-Mod?style=for-the-badge&logo=github) 
+[![Telegram](https://img.shields.io/badge/Contact-Telegram-26A5E4?style=for-the-badge&logo=telegram)](https://t.me/RizkiKotet)
 
-# Nikki (formerly MihomoTProxy)
+# Nikki (formerly MihomoTProxy) Mod
 
 Transparent Proxy with Mihomo on OpenWrt.
 
@@ -26,7 +30,7 @@ Transparent Proxy with Mihomo on OpenWrt.
 
 ```shell
 # only needs to be run once
-curl -s -L https://github.com/nikkinikki-org/OpenWrt-nikki/raw/refs/heads/main/feed.sh | ash
+curl -s -L https://github.com/rizkikotet-dev/OpenWrt-nikki-Mod/raw/refs/heads/main/feed.sh | ash
 ```
 
 2. Install
@@ -46,18 +50,18 @@ apk add --allow-untrusted luci-i18n-nikki-zh-cn
 ### B. Install From Release
 
 ```shell
-curl -s -L https://github.com/nikkinikki-org/OpenWrt-nikki/raw/refs/heads/main/install.sh | ash
+curl -s -L https://github.com/rizkikotet-dev/OpenWrt-nikki-Mod/raw/refs/heads/main/install.sh | ash
 ```
 
 ## Uninstall & Reset
 
 ```shell
-curl -s -L https://github.com/nikkinikki-org/OpenWrt-nikki/raw/refs/heads/main/uninstall.sh | ash
+curl -s -L https://github.com/rizkikotet-dev/OpenWrt-nikki-Mod/raw/refs/heads/main/uninstall.sh | ash
 ```
 
 ## How To Use
 
-See [Wiki](https://github.com/nikkinikki-org/OpenWrt-nikki/wiki)
+See [Wiki](https://github.com/rizkikotet-dev/OpenWrt-nikki/wiki)
 
 ## How does it work
 
@@ -74,7 +78,7 @@ Note that the steps above may change base on config.
 
 ```shell
 # add feed
-echo "src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki.git;main" >> "feeds.conf.default"
+echo "src-git nikki https://github.com/rizkikotet-dev/OpenWrt-nikki-Mod.git;main" >> "feeds.conf.default"
 # update & install feeds
 ./scripts/feeds update -a
 ./scripts/feeds install -a
