@@ -18,7 +18,7 @@ return view.extend({
 
         m = new form.Map('nikki');
 
-        s = m.section(form.NamedSection, 'config', 'config', _('p><strong>⚙️ Mixin Config</strong></p>'));
+        s = m.section(form.NamedSection, 'config', 'config', _('<p><strong>⚙️ Mixin Config</strong></p>'));
 
         o = s.option(form.Flag, 'mixin', _('Enable'));
         o.rmempty = false;
