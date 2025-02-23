@@ -3,6 +3,40 @@
 'require uci';
 'require fs';
 'require rpc';
+'require request';
+
+const callRCList = rpc.declare({
+    object: 'rc',
+    method: 'list',
+    params: ['name'],
+    expect: { '': {} }
+});
+
+const callRCInit = rpc.declare({
+    object: 'rc',
+    method: 'init',
+    params: ['name', 'action'],
+    expect: { '': {} }
+});
+
+const callNikkiVersion = rpc.declare({
+    object: 'luci.nikki',
+    method: 'version',
+    expect: { '': {} }
+});
+
+const callNikkiUpdateSubscription = rpc.declare({
+    object: 'luci.nikki',
+    method: 'update_subscription',
+    params: ['section_id'],
+    expect: { '': {} }
+});
+
+const callNikkiDebug = rpc.declare({
+    object: 'luci.nikki',
+    method: 'debug',
+    expect: { '': {} }
+});
 
 const homeDir = '/etc/nikki';
 const profilesDir = `${homeDir}/profiles`;
@@ -10,6 +44,9 @@ const subscriptionsDir = `${homeDir}/subscriptions`;
 const mixinFilePath = `${homeDir}/mixin.yaml`;
 const runDir = `${homeDir}/run`;
 const runProfilePath = `${runDir}/config.yaml`;
+const providersDir = `${runDir}/providers`;
+const ruleProvidersDir = `${providersDir}/rule`;
+const proxyProvidersDir = `${providersDir}/proxy`;
 const logDir = `/var/log/nikki`;
 const appLogPath = `${logDir}/app.log`;
 const coreLogPath = `${logDir}/core.log`;
@@ -21,6 +58,8 @@ return baseclass.extend({
     homeDir: homeDir,
     profilesDir: profilesDir,
     subscriptionsDir: subscriptionsDir,
+    ruleProvidersDir: ruleProvidersDir,
+    proxyProvidersDir: proxyProvidersDir,
     mixinFilePath: mixinFilePath,
     runDir: runDir,
     appLogPath: appLogPath,
@@ -29,12 +68,73 @@ return baseclass.extend({
     reservedIPNFT: reservedIPNFT,
     reservedIP6NFT: reservedIP6NFT,
 
-    callServiceList: rpc.declare({
-        object: 'service',
-        method: 'list',
-        params: ['name'],
-        expect: { '': {} }
-    }),
+    status: async function () {
+        return (await callRCList('nikki'))?.nikki?.running;
+    },
+
+    reload: function () {
+        return callRCInit('nikki', 'reload');
+    },
+
+    restart: function () {
+        return callRCInit('nikki', 'restart');
+    },
+
+    version: function () {
+        return callNikkiVersion();
+    },
+
+    updateSubscription: function (section_id) {
+        return callNikkiUpdateSubscription(section_id);
+    },
+
+    api: async function (method, path, query, body) {
+        const apiPort = uci.get('nikki', 'mixin', 'api_port');
+        const apiSecret = uci.get('nikki', 'mixin', 'api_secret');
+        const url = `http://${window.location.hostname}:${apiPort}${path}`;
+        return request.request(url, {
+            method: method,
+            headers: { 'Authorization': `Bearer ${apiSecret}` },
+            query: query,
+            content: body
+        })
+    },
+
+    openDashboard: function () {
+        const uiName = uci.get('nikki', 'mixin', 'ui_name');
+        const apiPort = uci.get('nikki', 'mixin', 'api_port');
+        const apiSecret = encodeURIComponent(uci.get('nikki', 'mixin', 'api_secret'));
+        const params = {
+            host: window.location.hostname,
+            hostname: window.location.hostname,
+            port: apiPort,
+            secret: apiSecret
+        };
+        const query = new URLSearchParams(params).toString();
+        let url;
+        if (uiName) {
+            url = `http://${window.location.hostname}:${apiPort}/ui/${uiName}/?${query}`;
+        } else {
+            url = `http://${window.location.hostname}:${apiPort}/ui/?${query}`;
+        }
+        setTimeout(function () { window.open(url, '_blank') }, 0);
+    },
+
+    updateDashboard: function () {
+        return this.api('POST', '/upgrade/ui');
+    },
+
+    listProfiles: function () {
+        return L.resolveDefault(fs.list(this.profilesDir), []);
+    },
+
+    listRuleProviders: function () {
+        return L.resolveDefault(fs.list(this.ruleProvidersDir), []);
+    },
+
+    listProxyProviders: function () {
+        return L.resolveDefault(fs.list(this.proxyProvidersDir), []);
+    },
 
     getAppLog: function () {
         return L.resolveDefault(fs.read_direct(this.appLogPath));
@@ -45,78 +145,15 @@ return baseclass.extend({
     },
 
     clearAppLog: function () {
-        return fs.exec_direct('/usr/libexec/nikki-call', ['clear_log', 'app']);
+        return fs.write(this.appLogPath);
     },
 
     clearCoreLog: function () {
-        return fs.exec_direct('/usr/libexec/nikki-call', ['clear_log', 'core']);
+        return fs.write(this.coreLogPath);
     },
 
-    listProfiles: function () {
-        return L.resolveDefault(fs.list(this.profilesDir), []);
-    },
-
-    updateSubscription: function (section_id) {
-        return fs.exec_direct('/usr/libexec/nikki-call', ['subscription', 'update', section_id]);
-    },
-
-    status: async function () {
-        try {
-            return (await this.callServiceList('nikki'))['nikki']['instances']['nikki']['running'];
-        } catch (ignored) {
-            return false;
-        }
-    },
-
-    reload: function () {
-        return fs.exec_direct('/usr/libexec/nikki-call', ['service', 'reload']);
-    },
-
-    restart: function () {
-        return fs.exec_direct('/usr/libexec/nikki-call', ['service', 'restart']);
-    },
-
-    appVersion: function () {
-        return L.resolveDefault(fs.exec_direct('/usr/libexec/nikki-call', ['version', 'app']), _('Unknown'));
-    },
-
-    coreVersion: function () {
-        return L.resolveDefault(fs.exec_direct('/usr/libexec/nikki-call', ['version', 'core']), _('Unknown'));
-    },
-
-    callMihomoAPI: async function (method, path, params, body) {
-        const running = await this.status();
-        if (running) {
-            const apiPort = uci.get('nikki', 'mixin', 'api_port');
-            const apiSecret = uci.get('nikki', 'mixin', 'api_secret');
-            const query = new URLSearchParams(params).toString();
-            const url = `http://${window.location.hostname}:${apiPort}${path}?${query}`;
-            await fetch(url, {
-                method: method,
-                headers: { 'Authorization': `Bearer ${apiSecret}` },
-                body: JSON.stringify(body)
-            })
-        } else {
-            alert(_('Service is not running.'));
-        }
-    },
-
-    openDashboard: async function () {
-        const running = await this.status();
-        if (running) {
-            const uiName = uci.get('nikki', 'mixin', 'ui_name');
-            const apiPort = uci.get('nikki', 'mixin', 'api_port');
-            const apiSecret = encodeURIComponent(uci.get('nikki', 'mixin', 'api_secret'));
-            let url;
-            if (uiName) {
-                url = `http://${window.location.hostname}:${apiPort}/ui/${uiName}/?host=${window.location.hostname}&hostname=${window.location.hostname}&port=${apiPort}&secret=${apiSecret}`;
-            } else {
-                url = `http://${window.location.hostname}:${apiPort}/ui/?host=${window.location.hostname}&hostname=${window.location.hostname}&port=${apiPort}&secret=${apiSecret}`;
-            }
-            setTimeout(function () { window.open(url, '_blank') }, 0);
-        } else {
-            alert(_('Service is not running.'));
-        }
+    debug: function () {
+        return callNikkiDebug();
     },
 
     getUsers: function () {
