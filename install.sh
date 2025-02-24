@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script configuration
-VERSION="3.1"
+VERSION="3.2"
 LOCKFILE="/tmp/nikkitproxy.lock"
 BACKUP_DIR="/root/backups-nikki"
 TEMP_DIR="/tmp"
@@ -31,6 +31,17 @@ setup_colors() {
     BFR="\\r\\033[K"
     HOLD=" "
     TAB="  "
+}
+
+error_msg() {
+    local line_number=${2:-${BASH_LINENO[0]}}
+    echo -e "${ERROR} ${1} (Line: ${line_number})" >&2
+    echo "Call stack:" >&2
+    local frame=0
+    while caller $frame; do
+        ((frame++))
+    done >&2
+    exit 1
 }
 
 spinner() {
@@ -105,7 +116,7 @@ check_dependencies() {
         for cmd in "${commands[@]}"; do
             if ! opkg list-installed | grep -q "^$cmd "; then
                 echo -e "${INFO} Installing missing dependency: $cmd"
-                cmdinstall "opkg update" "Updating package lists" || handle_error "Failed to update package lists"
+                cmdinstall "opkg update" "Updating package lists" || error_msg "Failed to update package lists"
                 cmdinstall "opkg install $cmd" "Installing $cmd"
             else
                 echo -e "${SUCCESS} $cmd is already installed"
@@ -118,7 +129,7 @@ check_dependencies() {
         for cmd in "${commands[@]}"; do
             if ! apk info -e "$cmd" &>/dev/null; then
                 echo -e "${INFO} Installing missing dependency: $cmd"
-                cmdinstall "apk update" "Updating package lists" || handle_error "Failed to update package lists"
+                cmdinstall "apk update" "Updating package lists" || error_msg "Failed to update package lists"
                 cmdinstall "apk add $cmd --allow-untrusted" "Installing $cmd"
             else
                 echo -e "${SUCCESS} $cmd is already installed"
@@ -126,7 +137,7 @@ check_dependencies() {
         done
         
     else
-        handle_error "No supported package manager found"
+        error_msg "No supported package manager found"
     fi
     echo -e "${SUCCESS} All dependencies are installed and available"
 }
@@ -141,7 +152,7 @@ cleanup() {
 
 # Backup functions with improved error checking
 ensure_backup_dir() {
-    mkdir -p "$BACKUP_DIR" || handle_error "Failed to create backup directory"
+    mkdir -p "$BACKUP_DIR" || error_msg "Failed to create backup directory"
 }
 
 perform_backup() {
@@ -171,12 +182,12 @@ perform_backup() {
 
 perform_restore() {
     local backup_file="$1"
-    [[ -f "$backup_file" ]] || handle_error "Backup file not found: $backup_file"
+    [[ -f "$backup_file" ]] || error_msg "Backup file not found: $backup_file"
 
     echo -e "${INFO} Starting restore process..."
     
     mkdir -p "$NIKKI_DIR/profiles" "$NIKKI_DIR/run" || 
-        handle_error "Failed to create directories"
+        error_msg "Failed to create directories"
     
     [[ -f "$NIKKI_CONFIG" ]] && cp "$NIKKI_CONFIG" "$NIKKI_CONFIG.bak"
 
@@ -195,7 +206,7 @@ install_config() {
     cmdinstall "curl -s -L -o $TEMP_DIR/main.zip https://github.com/rizkikotet-dev/Config-Open-ClashMeta/archive/refs/heads/main.zip" "Download Configuration"
 
     cmdinstall "unzip -o $TEMP_DIR/main.zip -d $TEMP_DIR" "Extract Configuration"
-    cd "$TEMP_DIR/Config-Open-ClashMeta-main" || handle_error "Failed to change directory"
+    cd "$TEMP_DIR/Config-Open-ClashMeta-main" || error_msg "Failed to change directory"
     
     mv -f config/Country.mmdb "$NIKKI_DIR/run/Country.mmdb" &> /dev/null && chmod +x "$NIKKI_DIR/run/Country.mmdb"
     mv -f config/GeoIP.dat "$NIKKI_DIR/run/GeoIP.dat" &> /dev/null && chmod +x "$NIKKI_DIR/run/GeoIP.dat"
@@ -212,14 +223,17 @@ install_config() {
     mv -f config/nikki $NIKKI_CONFIG &> /dev/null && chmod 644 $NIKKI_CONFIG
     
     echo -e "${INFO} Installing Yacd dashboard..."
-    cd "$TEMP_DIR" || handle_error "Failed to change directory"
+    cd "$TEMP_DIR" || error_msg "Failed to change directory"
+    if [[ -f "$TEMP_DIR/gh-pages.zip" ]]; then
+        rm -rf "$TEMP_DIR/gh-pages.zip"
+    fi
     cmdinstall "curl -s -L -o $TEMP_DIR/gh-pages.zip https://github.com/MetaCubeX/Yacd-meta/archive/refs/heads/gh-pages.zip" "Download Dashboard"
 
     cmdinstall "unzip -o $TEMP_DIR/gh-pages.zip -d $TEMP_DIR" "Extract Dashboard"
     if [[ -d "$NIKKI_DIR/run/ui/dashboard" ]]; then
         rm -rf "$NIKKI_DIR/run/ui/dashboard"
     fi
-    mv -fT "$TEMP_DIR/Yacd-meta-gh-pages" "$NIKKI_DIR/run/ui/dashboard" || handle_error "Failed to install dashboard"
+    mv -fT "$TEMP_DIR/Yacd-meta-gh-pages" "$NIKKI_DIR/run/ui/dashboard" || error_msg "Failed to install dashboard"
     echo -e "${INFO} Configuration installation completed successfully!"
 }
 
@@ -278,18 +292,18 @@ install_nikki() {
 
     # Check environment
     if [[ ! -x "/bin/opkg" && ! -x "/usr/bin/apk" || ! -x "/sbin/fw4" ]]; then
-        handle_error "System requirements not met. Only supports OpenWrt build with firewall4!"
+        error_msg "System requirements not met. Only supports OpenWrt build with firewall4!"
     fi
 
     # Include openwrt_release
     if [[ ! -f "/etc/openwrt_release" ]]; then
-        handle_error "OpenWrt release file not found"
+        error_msg "OpenWrt release file not found"
     fi
     . /etc/openwrt_release
 
     # Get branch/arch
     arch="$DISTRIB_ARCH"
-    [[ -z "$arch" ]] && handle_error "Could not determine system architecture"
+    [[ -z "$arch" ]] && error_msg "Could not determine system architecture"
     
     # Determine branch
     case "$DISTRIB_RELEASE" in
@@ -303,13 +317,13 @@ install_nikki() {
             branch="SNAPSHOT"
             ;;
         *)
-            handle_error "Unsupported OpenWrt release: $DISTRIB_RELEASE"
+            error_msg "Unsupported OpenWrt release: $DISTRIB_RELEASE"
             ;;
     esac
 
     # Create temporary directory for downloads
     local temp_dir=$(mktemp -d)
-    [[ ! -d "$temp_dir" ]] && handle_error "Failed to create temporary directory"
+    [[ ! -d "$temp_dir" ]] && error_msg "Failed to create temporary directory"
     
     # Download tarball
     echo -e "${INFO} Downloading Nikki-TProxy package..."
@@ -324,12 +338,12 @@ install_nikki() {
     # Install packages based on package manager
     if [ -x "/bin/opkg" ]; then
         cmdinstall "opkg update" "Update Package"
-        cd "$temp_dir" || handle_error "Failed to change to temporary directory"
+        cd "$temp_dir" || error_msg "Failed to change to temporary directory"
         cmdinstall "opkg install $temp_dir/nikki_*.ipk" "Install Mihomo Package"
         cmdinstall "opkg install $temp_dir/luci-app-nikki_*.ipk" "Install Luci Package"
     elif [ -x "/usr/bin/apk" ]; then
         cmdinstall "apk update" "Update Package"
-        cd "$temp_dir" || handle_error "Failed to change to temporary directory"
+        cd "$temp_dir" || error_msg "Failed to change to temporary directory"
         cmdinstall "apk add --allow-untrusted $temp_dir/nikki-*.apk" "Install Mihomo Package"
         cmdinstall "apk add --allow-untrusted $temp_dir/luci-app-nikki-*.apk" "Install Luci Package"
     fi
@@ -355,7 +369,7 @@ uninstall_nikki() {
         cmdinstall "apk del luci-app-nikki" "Remove Luci Package"
         cmdinstall "apk del nikki" "Remove Mihomo Package"
     else
-        handle_error "No supported package manager found"
+        error_msg "No supported package manager found"
     fi
 
     # Remove configuration files
@@ -404,9 +418,9 @@ display_menu() {
 }
 
 main() {
-    [[ -f "$LOCKFILE" ]] && handle_error "Script is already running"
+    [[ -f "$LOCKFILE" ]] && error_msg "Script is already running"
 
-    touch "$LOCKFILE" || handle_error "Failed to create lock file"
+    touch "$LOCKFILE" || error_msg "Failed to create lock file"
     trap cleanup EXIT
 
     check_dependencies
