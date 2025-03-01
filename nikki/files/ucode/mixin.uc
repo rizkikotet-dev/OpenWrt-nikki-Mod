@@ -21,18 +21,18 @@ config['tcp-concurrent'] = uci_bool(uci.get('nikki', 'mixin', 'tcp_concurrent'))
 config['keep-alive-idle'] = uci_int(uci.get('nikki', 'mixin', 'tcp_keep_alive_idle'));
 config['keep-alive-interval'] = uci_int(uci.get('nikki', 'mixin', 'tcp_keep_alive_interval'));
 
-config['external-ui'] = uci.get('nikki', 'mixin', 'ui_path') ?? 'ui';
+config['external-ui'] = uci.get('nikki', 'mixin', 'ui_path');
 config['external-ui-name'] = uci.get('nikki', 'mixin', 'ui_name');
 config['external-ui-url'] = uci.get('nikki', 'mixin', 'ui_url');
-config['external-controller'] = '[::]' + ':' + (uci.get('nikki', 'mixin', 'api_port') ?? '9090');
+config['external-controller'] = uci.get('nikki', 'mixin', 'api_listen');
 config['secret'] = uci.get('nikki', 'mixin', 'api_secret');
 
 config['allow-lan'] = uci_bool(uci.get('nikki', 'mixin', 'allow_lan'));
 config['port'] = uci_int(uci.get('nikki', 'mixin', 'http_port'));
 config['socks-port'] = uci_int(uci.get('nikki', 'mixin', 'socks_port'));
 config['mixed-port'] = uci_int(uci.get('nikki', 'mixin', 'mixed_port'));
-config['redir-port'] = uci_int(uci.get('nikki', 'mixin', 'redir_port') ?? '7891');
-config['tproxy-port'] = uci_int(uci.get('nikki', 'mixin', 'tproxy_port') ?? '7892');
+config['redir-port'] = uci_int(uci.get('nikki', 'mixin', 'redir_port'));
+config['tproxy-port'] = uci_int(uci.get('nikki', 'mixin', 'tproxy_port'));
 
 if (uci_bool(uci.get('nikki', 'mixin', 'authentication'))) {
 	config['authentication'] = [];
@@ -50,8 +50,8 @@ if (uci.get('nikki', 'proxy', 'tcp_transparent_proxy_mode') == 'tun' || uci.get(
 	config['tun']['auto-route'] = false;
 	config['tun']['auto-redirect'] = false;
 	config['tun']['auto-detect-interface'] = false;
-	config['tun']['device'] = uci.get('nikki', 'mixin', 'tun_device') ?? 'nikki';
-	config['tun']['stack'] = uci.get('nikki', 'mixin', 'tun_stack') ?? 'system';
+	config['tun']['device'] = uci.get('nikki', 'mixin', 'tun_device');
+	config['tun']['stack'] = uci.get('nikki', 'mixin', 'tun_stack');
 	config['tun']['mtu'] = uci_int(uci.get('nikki', 'mixin', 'tun_mtu'));
 	config['tun']['gso'] = uci_bool(uci.get('nikki', 'mixin', 'tun_gso'));
 	config['tun']['gso-max-size'] = uci_int(uci.get('nikki', 'mixin', 'tun_gso_max_size'));
@@ -65,10 +65,10 @@ if (uci.get('nikki', 'proxy', 'tcp_transparent_proxy_mode') == 'tun' || uci.get(
 
 config['dns'] = {};
 config['dns']['enable'] = true;
-config['dns']['listen'] = '[::]' + ':' + (uci.get('nikki', 'mixin', 'dns_port') ?? '1053');
+config['dns']['listen'] = uci.get('nikki', 'mixin', 'dns_listen');
 config['dns']['ipv6'] = uci_bool(uci.get('nikki', 'mixin', 'dns_ipv6'));
-config['dns']['enhanced-mode'] = uci.get('nikki', 'mixin', 'dns_mode') ?? 'fake-ip';
-config['dns']['fake-ip-range'] = uci.get('nikki', 'mixin', 'fake_ip_range') ?? '198.18.0.1/16';
+config['dns']['enhanced-mode'] = uci.get('nikki', 'mixin', 'dns_mode');
+config['dns']['fake-ip-range'] = uci.get('nikki', 'mixin', 'fake_ip_range');
 if (uci_bool(uci.get('nikki', 'mixin', 'fake_ip_filter'))) {
 	config['dns']['fake-ip-filter'] = uci_array(uci.get('nikki', 'mixin', 'fake_ip_filters'));
 }
@@ -170,16 +170,7 @@ if (uci_bool(uci.get('nikki', 'mixin', 'rule'))) {
 		if (!uci_bool(section.enabled)) {
 			return;
 		}
-		let rule;
-		if (length(section.type) > 0) {
-			rule = `${section.type},${section.matcher},${section.node}`;
-		} else {
-			rule = `${section.matcher},${section.node}`;
-		}
-		if (uci_bool(section.no_resolve)) {
-			rule += ',no_resolve';
-		}
-		push(config['nikki-rules'], rule);
+		push(config['nikki-rules'], `${section.type},${section.matcher},${section.node}` + (uci_bool(section.no_resolve) ? ',no_resolve' : ''));
 	})
 }
 
