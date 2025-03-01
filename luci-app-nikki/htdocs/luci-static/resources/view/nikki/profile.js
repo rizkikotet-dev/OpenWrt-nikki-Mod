@@ -15,7 +15,7 @@ return view.extend({
 
         m = new form.Map('nikki');
 
-        s = m.section(form.NamedSection, 'config', 'config', _('Profile'));
+        s = m.section(form.NamedSection, 'config', 'config', _('<p><strong>📁 Profile</strong></p>'));
 
         o = s.option(form.FileUpload, '_upload_profile', _('Upload Profile'));
         o.browser = true;
@@ -25,7 +25,7 @@ return view.extend({
             return true;
         };
 
-        s = m.section(form.GridSection, 'subscription', _('Subscription'));
+        s = m.section(form.GridSection, 'subscription', _('<p><strong>💾 Subscription</strong></p>'));
         s.addremove = true;
         s.anonymous = true;
         s.sortable = true;
