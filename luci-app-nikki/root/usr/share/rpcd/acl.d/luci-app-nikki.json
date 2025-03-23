@@ -8,8 +8,6 @@
                 "luci.nikki": [ "*" ]
             },
             "file": {
-                "/etc/passwd": ["read"],
-                "/etc/group": ["read"],
                 "/etc/nikki/profiles/*.yaml": ["read"],
                 "/etc/nikki/profiles/*.yml": ["read"],
                 "/etc/nikki/subscriptions/*.yaml": ["read"],
@@ -20,8 +18,7 @@
                 "/etc/nikki/run/providers/proxy/*": ["read"],
                 "/etc/nikki/nftables/reserved_ip.nft": ["read"],
                 "/etc/nikki/nftables/reserved_ip6.nft": ["read"],
-                "/var/log/nikki/*.log": ["read"],
-                "/var/run/nikki/debug.md": ["read"]
+                "/var/log/nikki/*.log": ["read"]
             }
         },
         "write": {

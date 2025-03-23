@@ -11,7 +11,7 @@ Transparent Proxy with Mihomo on OpenWrt.
 ## Prerequisites
 
 - OpenWrt >= 23.05
-- Linux Kernel >= 5.10
+- Linux Kernel >= 5.13
 - firewall4
 
 ## Feature
@@ -90,6 +90,7 @@ The ipk/apk file will be found under `bin/packages/your_architecture/nikki`.
 - firewall4
 - ip-full
 - kmod-inet-diag
+- kmod-nft-socket
 - kmod-nft-tproxy
 - kmod-tun
 

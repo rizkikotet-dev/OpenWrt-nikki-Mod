@@ -3,6 +3,7 @@
 'use strict';
 
 import { access, popen } from 'fs';
+import { get_users, get_groups, get_cgroups } from '/etc/nikki/ucode/include.uc';
 
 const methods = {
 	version: {
@@ -11,20 +12,20 @@ const methods = {
 			let app = '';
 			if (system('command -v opkg') == 0) {
 				process = popen('opkg list-installed luci-app-nikki | cut -d " " -f 3');
-				if (process != null) {
+				if (process) {
 					app = trim(process.read('all'));
 					process.close();
 				}
 			} else if (system('command -v apk') == 0) {
 				process = popen('apk list -I luci-app-nikki | cut -d " " -f 1 | cut -d "-" -f 4');
-				if (process != null) {
+				if (process) {
 					app = trim(process.read('all'));
 					process.close();
 				}
 			}
 			let core = '';
 			process = popen('mihomo -v | grep Mihomo | cut -d " " -f 3');
-			if (process != null) {
+			if (process) {
 				core = trim(process.read('all'));
 				process.close();
 			}
@@ -37,8 +38,8 @@ const methods = {
 			const filepath = '/etc/nikki/run/config.yaml';
 			if (access(filepath, 'r')) {
 				const process = popen(`yq -p yaml -o json < ${filepath}`);
-				if (process != null) {
-					profile = json(process.read('all'));
+				if (process) {
+					profile = json(trim(process.read('all')));
 					process.close();
 				}
 			}
@@ -56,9 +57,17 @@ const methods = {
 			return { success: success };
 		}
 	},
+	get_identifiers: {
+		call: function() {
+			const users = filter(get_users(), (x) => x != '' && x != 'root');
+			const groups = filter(get_groups(), (x) => x != '' && x != 'root');
+			const cgroups = filter(get_cgroups(), (x) => x != '' && x != 'nikki');
+			return { users: users, groups: groups, cgroups: cgroups };
+		}
+	},
 	debug: {
 		call: function() {
-			const success = system('/etc/nikki/scripts/debug.sh > /var/run/nikki/debug.md') == 0;
+			const success = system('/etc/nikki/scripts/debug.sh > /var/log/nikki/debug.log') == 0;
 			return { success: success };
 		}
 	}
