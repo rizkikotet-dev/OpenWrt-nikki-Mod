@@ -35,26 +35,26 @@ return view.extend({
 
         let m, s, o;
 
-        m = new form.Map('nikki', _('Nikki'), `${_('Transparent Proxy with Mihomo on OpenWrt.')} <a href="https://github.com/nikkinikki-org/OpenWrt-nikki/wiki" target="_blank">${_('How To Use')}</a>`);
+        m = new form.Map('nikki', _('<p><strong><span style="color: rgb(41, 105, 176);">✦ Nikki</span> <span style="color: rgb(250, 197, 28);">Mod ✦</span></strong></p>'), `${_('Transparent Proxy with Mihomo on OpenWrt.')} <a href="https://github.com/nikkinikki-org/OpenWrt-nikki/wiki" target="_blank">${_('How To Use')}</a>`);
 
-        s = m.section(form.TableSection, 'status', _('Status'));
+        s = m.section(form.TableSection, 'status', _('<p><strong>📣 Status</strong></p>'));
         s.anonymous = true;
 
-        o = s.option(form.Value, '_app_version', _('App Version'));
+        o = s.option(form.Value, '_app_version', _('🔹App Version'));
         o.readonly = true;
         o.load = function () {
             return appVersion;
         };
         o.write = function () { };
 
-        o = s.option(form.Value, '_core_version', _('Core Version'));
+        o = s.option(form.Value, '_core_version', _('🔹Core Version'));
         o.readonly = true;
         o.load = function () {
             return coreVersion;
         };
         o.write = function () { };
 
-        o = s.option(form.DummyValue, '_core_status', _('Core Status'));
+        o = s.option(form.DummyValue, '_core_status', _('🔹Core Status'));
         o.cfgvalue = function () {
             return renderStatus(running);
         };
@@ -66,32 +66,32 @@ return view.extend({
 
         o = s.option(form.Button, 'reload');
         o.inputstyle = 'action';
-        o.inputtitle = _('Reload Service');
+        o.inputtitle = _('⟳ Reload Service');
         o.onclick = function () {
             return nikki.reload();
         };
 
         o = s.option(form.Button, 'restart');
         o.inputstyle = 'negative';
-        o.inputtitle = _('Restart Service');
+        o.inputtitle = _('⟳ Restart Service');
         o.onclick = function () {
             return nikki.restart();
         };
 
         o = s.option(form.Button, 'update_dashboard');
         o.inputstyle = 'positive';
-        o.inputtitle = _('Update Dashboard');
+        o.inputtitle = _('📤 Update Dashboard');
         o.onclick = function () {
             return nikki.updateDashboard();
         };
 
         o = s.option(form.Button, 'open_dashboard');
-        o.inputtitle = _('Open Dashboard');
+        o.inputtitle = _('👾 Open Dashboard');
         o.onclick = function () {
             return nikki.openDashboard();
         };
 
-        s = m.section(form.NamedSection, 'config', 'config', _('App Config'));
+        s = m.section(form.NamedSection, 'config', 'config', _('<p><strong>⚙️ App Config</strong></p>'));
 
         o = s.option(form.Flag, 'enabled', _('Enable'));
         o.rmempty = false;
@@ -125,7 +125,7 @@ return view.extend({
         o = s.option(form.Flag, 'fast_reload', _('Fast Reload'));
         o.rmempty = false;
 
-        s = m.section(form.NamedSection, 'config', 'config', _('Core Environment Variable Config'));
+        s = m.section(form.NamedSection, 'config', 'config', _('<p><strong>🔑 Core Environment Variable Config</strong></p>'));
 
         o = s.option(form.Flag, 'disable_safe_path_check', _('Disable Safe Path Check'));
         o.ucisection = 'env';

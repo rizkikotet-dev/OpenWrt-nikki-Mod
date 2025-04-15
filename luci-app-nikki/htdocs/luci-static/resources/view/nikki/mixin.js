@@ -23,7 +23,7 @@ return view.extend({
 
         m = new form.Map('nikki');
 
-        s = m.section(form.NamedSection, 'mixin', 'mixin', _('Mixin Option'));
+        s = m.section(form.NamedSection, 'mixin', 'mixin', _('<p><strong>⚙️ Mixin Option</strong></p>'));
 
         s.tab('general', _('General Config'));
 
