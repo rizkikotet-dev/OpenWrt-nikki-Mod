@@ -1,6 +1,6 @@
 ![GitHub License](https://img.shields.io/github/license/nikkinikki-org/OpenWrt-nikki?style=for-the-badge&logo=github) ![GitHub Tag](https://img.shields.io/github/v/release/nikkinikki-org/OpenWrt-nikki?style=for-the-badge&logo=github) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/nikkinikki-org/OpenWrt-nikki/total?style=for-the-badge&logo=github) ![GitHub Repo stars](https://img.shields.io/github/stars/nikkinikki-org/OpenWrt-nikki?style=for-the-badge&logo=github) [![Telegram](https://img.shields.io/badge/Telegram-gray?style=for-the-badge&logo=telegram)](https://t.me/+gIykCBeHncVjYzU1)
 
-# Nikki
+# Nikki (formerly MihomoTProxy)
 
 Transparent Proxy with Mihomo on OpenWrt.
 
@@ -12,7 +12,7 @@ Transparent Proxy with Mihomo on OpenWrt.
 
 ## Feature
 
-- Transparent Proxy (Redirect/TPROXY/TUN, IPv4 and/or IPv6)
+- Transparent Proxy (TPROXY/TUN, IPv4 and/or IPv6)
 - Access Control
 - Profile Mixin
 - Profile Editor
@@ -38,9 +38,9 @@ opkg install nikki
 opkg install luci-app-nikki
 opkg install luci-i18n-nikki-zh-cn
 # for apk
-apk add nikki
-apk add luci-app-nikki
-apk add luci-i18n-nikki-zh-cn
+apk add --allow-untrusted nikki
+apk add --allow-untrusted luci-app-nikki
+apk add --allow-untrusted luci-i18n-nikki-zh-cn
 ```
 
 ### B. Install From Release
@@ -63,9 +63,10 @@ See [Wiki](https://github.com/nikkinikki-org/OpenWrt-nikki/wiki)
 
 1. Mixin and Update profile.
 2. Run mihomo.
-3. Set scheduled restart.
-4. Set ip rule/route
-5. Generate nftables and apply it.
+3. Run hijack prepare script.
+4. Set router hijack.
+5. Set lan hijack with access control.
+6. Set scheduled restart.
 
 Note that the steps above may change base on config.
 
