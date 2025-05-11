@@ -82,7 +82,7 @@ echo "src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki.git;main" >>
 make package/luci-app-nikki/compile
 ```
 
-The package files will be found under `bin/packages/your_architecture/nikki`.
+The ipk/apk file will be found under `bin/packages/your_architecture/nikki`.
 
 ## Dependencies
 
